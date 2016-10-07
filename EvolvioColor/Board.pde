@@ -1,30 +1,34 @@
 import java.io.*;
 
-class Board{
-  int boardWidth;
-  int boardHeight;
-  int creatureMinimum;
-  Tile[][] tiles;
-  double year = 0;
-  float MIN_TEMPERATURE;
-  float MAX_TEMPERATURE;
-  final float THERMOMETER_MIN = -2;
-  final float THERMOMETER_MAX = 2;
-  final int ROCKS_TO_ADD;
-  final float MIN_ROCK_ENERGY_BASE = 0.8;
-  final float MAX_ROCK_ENERGY_BASE = 1.6;
-  final float MIN_CREATURE_ENERGY = 1.2;
-  final float MAX_CREATURE_ENERGY = 2.0;
-  final float ROCK_DENSITY = 5;
-  final float OBJECT_TIMESTEPS_PER_YEAR = 100;
-  final color ROCK_COLOR = color(0,0,0.5);
+class Board {
+  int boardWidth;                                          // the width of the board
+  int boardHeight;                                         // the height of the board
+  int creatureMinimum;                                     // the minimum number of creatures in our world
+  Tile [][] tiles;                                         // tile matrix
+  double year = 0;                                         // how many years have passed
+  
+  float MIN_TEMPERATURE;                                   // minimum temperature determined by the UI
+  float MAX_TEMPERATURE;                                   // maximum temperature determined by the UI
+  final float THERMOMETER_MIN = -2;                        // the minimum value of the thermometer
+  final float THERMOMETER_MAX = 2;                         // the maximum value of the termometer
+  final int ROCKS_TO_ADD;                                  // the number of rocks to add
+  final float MIN_ROCK_ENERGY_BASE = 0.8;                  // the lowest energy cost possible for a rock
+  final float MAX_ROCK_ENERGY_BASE = 1.6;                  // the highest energy cost possible for a rock
+  final float MIN_CREATURE_ENERGY = 1.2;                   // the lowest possible energy for a creature
+  final float MAX_CREATURE_ENERGY = 2.0;                   // the highest possible energy for a creature
+  final float ROCK_DENSITY = 5;                            // how dense are rocks
+  final float OBJECT_TIMESTEPS_PER_YEAR = 100;             // not sure
+  final color ROCK_COLOR = color(0, 0, 0.5);               
   final color BACKGROUND_COLOR = color(0,0,0.1);
   final float MINIMUM_SURVIVABLE_SIZE = 0.2;
+  
   ArrayList[][] softBodiesInPositions;
   ArrayList<SoftBody> rocks;
   ArrayList<Creature> creatures;
+  
   Creature selectedCreature = null;
   int creatureIDUpTo = 0;
+  
   float[] letterFrequencies = {8.167,1.492,2.782,4.253,12.702,2.228,2.015,6.094,6.966,0.153,0.772,4.025,2.406,6.749,
   7.507,1.929,0.095,5.987,6.327,9.056,2.758,0.978,2.361,0.150,1.974,10000.0};//0.074};
   final int LIST_SLOTS = 6;
