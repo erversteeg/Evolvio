@@ -1,58 +1,54 @@
 import java.io.*;
 
 class Board {
-  int boardWidth;                                          // the width of the board
-  int boardHeight;                                         // the height of the board
-  int creatureMinimum;                                     // the minimum number of creatures in our world
-  Tile [][] tiles;                                         // tile matrix
-  double year = 0;                                         // how many years have passed
-  
-  float MIN_TEMPERATURE;                                   // minimum temperature determined by the UI
-  float MAX_TEMPERATURE;                                   // maximum temperature determined by the UI
-  final float THERMOMETER_MIN = -2;                        // the minimum value of the thermometer
-  final float THERMOMETER_MAX = 2;                         // the maximum value of the termometer
-  final int ROCKS_TO_ADD;                                  // the number of rocks to add
-  final float MIN_ROCK_ENERGY_BASE = 0.8;                  // the lowest energy cost possible for a rock
-  final float MAX_ROCK_ENERGY_BASE = 1.6;                  // the highest energy cost possible for a rock
-  final float MIN_CREATURE_ENERGY = 1.2;                   // the lowest possible energy for a creature
-  final float MAX_CREATURE_ENERGY = 2.0;                   // the highest possible energy for a creature
-  final float ROCK_DENSITY = 5;                            // how dense are rocks
-  final float OBJECT_TIMESTEPS_PER_YEAR = 100;             // not sure
-  final color ROCK_COLOR = color(0, 0, 0.5);               
-  final color BACKGROUND_COLOR = color(0,0,0.1);
-  final float MINIMUM_SURVIVABLE_SIZE = 0.2;
-  
-  ArrayList[][] softBodiesInPositions;
-  ArrayList<SoftBody> rocks;
-  ArrayList<Creature> creatures;
-  
-  Creature selectedCreature = null;
-  int creatureIDUpTo = 0;
-  
+  int boardWidth;                                      // the width of the board in tiles
+  int boardHeight;                                     // the height of the board in tiles          
+  int creatureMinimum;                                 // minimum number of creatures
+  Tile[][] tiles;                                      // tile storage
+  double year = 0;                                     // how many years has it been?
+  float MIN_TEMPERATURE;                               // min temp (determined by slider)
+  float MAX_TEMPERATURE;                               // max temp (determined by slider)
+  final float THERMOMETER_MIN = -2;                    // min value that thermometer can have
+  final float THERMOMETER_MAX = 2;                     // max value that thermometer can have
+  final int ROCKS_TO_ADD;                              // number of rocks to add to board
+  final float MIN_ROCK_ENERGY_BASE = 0.8;              // ()
+  final float MAX_ROCK_ENERGY_BASE = 1.6;              // ()
+  final float MIN_CREATURE_ENERGY = 1.2;               // ()
+  final float MAX_CREATURE_ENERGY = 2.0;               // ()
+  final float ROCK_DENSITY = 5;                        // the density of rocks
+  final float OBJECT_TIMESTEPS_PER_YEAR = 100;         // objects are updated 100 times per year
+  final color ROCK_COLOR = color(0,0,0.5);             // default rock color
+  final color BACKGROUND_COLOR = color(0,0,0.1);       // background color
+  final float MINIMUM_SURVIVABLE_SIZE = 0.2;           // the size at which the creature becomes one with the universe
+  ArrayList[][] softBodiesInPositions;                 // storage for all soft bodies
+  ArrayList<SoftBody> rocks;                           // storage for rocks
+  ArrayList<Creature> creatures;                       // storage for creatures
+  Creature selectedCreature = null;                    // selected creature
+  int creatureIDUpTo = 0;                              // keep track of how many ids have been assigned to creatures
   float[] letterFrequencies = {8.167,1.492,2.782,4.253,12.702,2.228,2.015,6.094,6.966,0.153,0.772,4.025,2.406,6.749,
-  7.507,1.929,0.095,5.987,6.327,9.056,2.758,0.978,2.361,0.150,1.974,10000.0};//0.074};
-  final int LIST_SLOTS = 6;
-  int creatureRankMetric = 0;
-  color buttonColor = color(0.82,0.8,0.7);
-  Creature[] list = new Creature[LIST_SLOTS];
-  final int creatureMinimumIncrement = 5;
-  String folder = "TEST";
-  int[] fileSaveCounts;
-  double[] fileSaveTimes;
-  double imageSaveInterval = 1;
-  double textSaveInterval = 1;
-  final double FLASH_SPEED = 80;
-  boolean userControl;
-  float temperature;
-  double MANUAL_BIRTH_SIZE = 1.2;
-  boolean wasPressingB = false;
-  double timeStep; 
-  int POPULATION_HISTORY_LENGTH = 200;
-  int[] populationHistory;
-  double recordPopulationEvery = 0.02;
-  int playSpeed = 1;
+  7.507,1.929,0.095,5.987,6.327,9.056,2.758,0.978,2.361,0.150,1.974,10000.0};//0.074};    // the probabality that a given character will be used in a creature name
+  final int LIST_SLOTS = 6;                            // how many creatures appear in the ranked list
+  int creatureRankMetric = 0;                          // keeps track of which creature rank metric is currently active
+  color buttonColor = color(0.82,0.8,0.7);             // default button color
+  Creature[] list = new Creature[LIST_SLOTS];          // top ranked creatures
+  final int creatureMinimumIncrement = 5;              // 
+  String folder = "TEST";                              // name of folder to save progress and images to
+  int[] fileSaveCounts;                                // ()
+  double[] fileSaveTimes;                              // ()
+  double imageSaveInterval = 1;                        // ()
+  double textSaveInterval = 1;                         // ()
+  final double FLASH_SPEED = 80;                       // 
+  boolean userControl;                                 // user controlled or brain
+  float temperature;                                   // the current temperature
+  double MANUAL_BIRTH_SIZE = 1.2;                      // the size at which creatures can give birth
+  boolean wasPressingB = false;                        // 
+  double timeStep;                                     // the current time step
+  int POPULATION_HISTORY_LENGTH = 200;                 // 
+  int[] populationHistory;                             //
+  double recordPopulationEvery = 0.02;                 //
+  int playSpeed = 1;                                   //
  
-  public Board(int w, int h, float stepSize, float min, float max, int rta, int cm, int SEED, String INITIAL_FILE_NAME, double ts){
+  public Board(int w, int h, float stepSize, float min, float max, int rta, int cm, int SEED, String INITIAL_FILE_NAME, double ts) {
     noiseSeed(SEED);
     randomSeed(SEED);
     boardWidth = w;
@@ -121,7 +117,9 @@ class Board {
     fill(BACKGROUND_COLOR);
     rect(0,0,scaleUp*boardWidth,scaleUp*boardHeight);
   }
-  public void drawUI(float scaleUp,double timeStep, int x1, int y1, int x2, int y2, PFont font){
+  
+  // draws the right-hand panes and static UI elements
+  public void drawUI(float scaleUp,double timeStep, int x1, int y1, int x2, int y2, PFont font) {
     fill(0,0,0);
     noStroke();
     rect(x1,y1,x2-x1,y2-y1);
@@ -132,7 +130,7 @@ class Board {
     fill(0,0,1);
     textAlign(LEFT);
     textFont(font,48);
-    String yearText = "Year "+nf((float)year,0,2);
+    String yearText = "Year " + nf((float) year, 0, 2);
     text(yearText,10,48);
     float seasonTextXCoor = textWidth(yearText)+50;
     textFont(font,24);
